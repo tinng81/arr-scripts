@@ -1,9 +1,8 @@
 #!/usr/bin/with-contenv bash
 
 echo "************ install packages ************" && \
-apt-get -qqy update && \
-apt-get -qqy install \
-    libxml2-utils
+apk add -U --update --no-cache \
+    libxml2-utils \
 	flac \
 	opus-tools \
 	jq \
@@ -12,7 +11,7 @@ apt-get -qqy install \
 	mkvtoolnix \
 	python3-dev \
 	libc-dev \
-	python3-pip \
+	py3-pip \
 	gcc \
 	ffmpeg
 
