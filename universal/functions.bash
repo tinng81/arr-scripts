@@ -21,15 +21,15 @@ logfileSetup () {
 getArrAppInfo () {
   # Get Arr App information
   if [ -z "$arrUrl" ] || [ -z "$arrApiKey" ]; then
-    arrUrlBase="$(cat /config/config.xml | xq | jq -r .Config.UrlBase)"
+    arrUrlBase="$(xmllint --xpath "string(//UrlBase)" /config/config.xml)"
     if [ "$arrUrlBase" == "null" ]; then
       arrUrlBase=""
     else
       arrUrlBase="/$(echo "$arrUrlBase" | sed "s/\///g")"
     fi
-    arrName="$(cat /config/config.xml | xq | jq -r .Config.InstanceName)"
-    arrApiKey="$(cat /config/config.xml | xq | jq -r .Config.ApiKey)"
-    arrPort="$(cat /config/config.xml | xq | jq -r .Config.Port)"
+    arrName="$(xmllint --xpath "string(//InstanceName)" /config/config.xml)"
+    arrApiKey="$(xmllint --xpath "string(//ApiKey)" /config/config.xml)"
+    arrPort="$(xmllint --xpath "string(//Port)" /config/config.xml)"
     arrUrl="http://127.0.0.1:${arrPort}${arrUrlBase}"
   fi
 }
@@ -49,7 +49,7 @@ verifyApiAccess () {
       break
     else
       log "$arrName is not ready, sleeping until valid response..."
-      sleep 1
+      sleep 10
     fi
   done
 }
