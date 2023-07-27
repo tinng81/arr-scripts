@@ -143,7 +143,7 @@ DownloadExtras () {
                 yt-dlp -f "$videoFormat" --no-video-multistreams -o "$finalPath/$finalFileName" --write-sub --sub-lang $videoLanguages --embed-subs --merge-output-format mkv --no-mtime --geo-bypass $ytdlpExtraOpts "https://www.youtube.com/watch?v=$tmdbExtraKey" &>/dev/null
             fi
             if [ -f "$finalPath/$finalFileName.mkv" ]; then
-                log "$itemTitle :: $i of $tmdbVideosListDataIdsCount :: $tmdbExtraType :: $tmdbExtraTitle ($tmdbExtraKey) :: Compete"
+                log "$itemTitle :: $i of $tmdbVideosListDataIdsCount :: $tmdbExtraType :: $tmdbExtraTitle ($tmdbExtraKey) :: Complete"
                 chmod 666 "$finalPath/$finalFileName.mkv"
             else
                 log "$itemTitle :: $i of $tmdbVideosListDataIdsCount :: $tmdbExtraType :: $tmdbExtraTitle ($tmdbExtraKey) :: ERROR :: Download Failed"
@@ -174,28 +174,6 @@ DownloadExtras () {
 
 }
 
-NotifyPlex () {
-    # Process item with PlexNotify.bash if plexToken is configured
-    if [ ! -z "$plexToken" ]; then
-        # Always update plex if extra is downloaded
-        if [ "$updatePlex" == "true" ]; then
-            log "$itemTitle :: Using PlexNotify.bash to update Plex...."
-            bash /config/extended/PlexNotify.bash "$itemPath"
-            exit
-        fi
-        
-        # Do not notify plex if this script was triggered by the AutoExtras.bash and no Extras were downloaded
-        if [ "$autoScan" == "true" ]; then 
-            log "$itemTitle :: Skipping plex notification, not needed...."
-            exit
-        else
-            log "$itemTitle :: Using PlexNotify.bash to update Plex...."
-            bash /config/extended/PlexNotify.bash "$itemPath"
-            exit
-        fi
-    fi
-}
-
 # Check if series has been previously processed
 if [ -f "/config/extended/logs/extras/$tmdbId" ]; then
     # Delete log file older than 7 days, to allow re-processing
@@ -204,11 +182,9 @@ fi
 
 if [ -f "/config/extended/logs/extras/$tmdbId" ]; then
     log "$itemTitle :: Already processed Extras, waiting 7 days to re-check..."
-    NotifyPlex
     exit
 else
     DownloadExtras
-    NotifyPlex
 fi
 
 exit
