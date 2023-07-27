@@ -204,24 +204,12 @@ do
             yt-dlp -f "$videoFormat" --no-video-multistreams -o "$finalPath/$finalFileName" --write-sub --sub-lang $videoLanguages --embed-subs --merge-output-format mkv --no-mtime --geo-bypass $ytdlpExtraOpts "https://www.youtube.com/watch?v=$tmdbExtraKey"
         fi
         if [ -f "$finalPath/$finalFileName.mkv" ]; then
-            log "$itemTitle :: $i of $tmdbVideosListDataIdsCount :: $tmdbExtraType :: $tmdbExtraTitle ($tmdbExtraKey) :: Compete"
+            log "$itemTitle :: $i of $tmdbVideosListDataIdsCount :: $tmdbExtraType :: $tmdbExtraTitle ($tmdbExtraKey) :: Complete"
             chmod 666 "$finalPath/$finalFileName.mkv"
         else
             log "$itemTitle :: $i of $tmdbVideosListDataIdsCount :: $tmdbExtraType :: $tmdbExtraTitle ($tmdbExtraKey) :: ERROR :: Download Failed"
             continue
         fi
-
-        if python3 /usr/local/sma/manual.py --config "/config/extended/sma.ini" -i "$finalPath/$finalFileName.mkv" -nt; then
-            sleep 0.01
-            log "$itemTitle :: $i of $tmdbVideosListDataIdsCount :: $tmdbExtraType :: $tmdbExtraTitle :: Processed with SMA..."
-            rm  /usr/local/sma/config/*log*
-        else
-            log "$itemTitle :: $i of $tmdbVideosListDataIdsCount :: $tmdbExtraType :: $tmdbExtraTitle :: ERROR :: SMA Processing Error"
-            rm "$finalPath/$finalFileName.mkv"
-            log "$itemTitle :: $i of $tmdbVideosListDataIdsCount :: $tmdbExtraType :: $tmdbExtraTitle :: INFO: deleted: $finalPath/$finalFileName.mkv"
-        fi
-
-        updatePlex="true"
 
         if [ "$extrasSingle" == "true" ]; then
             log "$itemTitle :: $i of $tmdbVideosListDataIdsCount :: $tmdbExtraType :: Finished processing single trailer download" 
@@ -231,25 +219,5 @@ do
     done
 
 done
-
-# Process item with PlexNotify.bash if plexToken is configured
-if [ ! -z "$plexToken" ]; then
-    # Always update plex if extra is downloaded
-    if [ "$updatePlex" == "true" ]; then
-        log "Using PlexNotify.bash to update Plex...."
-        bash /config/extended/PlexNotify.bash "$itemPath"
-        exit
-    fi
-    
-    # Do not notify plex if this script was triggered by the AutoExtras.bash and no Extras were downloaded
-    if [ "$autoScan" == "true" ]; then 
-        log "Skipping plex notification, not needed...."
-        exit
-    else
-        log "Using PlexNotify.bash to update Plex...."
-        bash /config/extended/PlexNotify.bash "$itemPath"
-        exit
-    fi
-fi
 
 exit
